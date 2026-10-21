@@ -1,69 +1,84 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+
+"use client";
+
+import { useState } from "react";
+import "./globals.css";
 
 export default function Home() {
+  const [name, setName] = useState("");
+  const [course, setCourse] = useState("");
+  const [students, setStudents] = useState([]);
+
+  function addStudent(e) {
+    e.preventDefault();
+
+    if (!name.trim() || !course.trim()) return;
+
+    setStudents([
+      ...students,
+      {
+        id: Date.now(),
+        name: name.trim(),
+        course: course.trim(),
+      },
+    ]);
+
+    setName("");
+    setCourse("");
+  }
+
+  function deleteStudent(id) {
+    setStudents(students.filter((student) => student.id !== id));
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="container">
+      <h1>Student Information App</h1>
+      <p>Built with React.js and Next.js</p>
+
+      <form onSubmit={addStudent} className="student-form">
+        <input
+          type="text"
+          placeholder="Enter student name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
         />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.js</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+
+        <input
+          type="text"
+          placeholder="Enter course name"
+          value={course}
+          onChange={(e) => setCourse(e.target.value)}
+          required
+        />
+
+        <button type="submit">Add Student</button>
+      </form>
+
+      <h2>Student List ({students.length})</h2>
+
+      {students.length === 0 ? (
+        <p>No students added yet.</p>
+      ) : (
+        <div className="student-list">
+          {students.map((student) => (
+            <div className="student-card" key={student.id}>
+              <div>
+                <h3>{student.name}</h3>
+                <p>Course: {student.course}</p>
+              </div>
+
+              <button
+                className="delete-button"
+                onClick={() => deleteStudent(student.id)}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      )}
+    </main>
   );
 }
